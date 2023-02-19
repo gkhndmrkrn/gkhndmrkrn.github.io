@@ -1,1 +1,73 @@
-deneme
+<!doctype html>
+
+<html>
+    <head>
+        <meta charset="utf-8">
+
+        <title>Gkhn</title>
+
+        
+        <style>
+          #metin{
+    font-size: 50px;
+}
+button{
+    height: 250px;
+    width: 250px;
+    font-size: 40px;
+}
+</style>
+    </head>
+
+    <body>
+        <div id="metin">
+            metin alanı
+        </div>
+        
+        <button id="btn">Dinle Beni</button>
+        <script>
+      const btn = document.getElementById("btn")
+const metin = document.getElementById("metin")
+const SpeechRecognitaion = window.SpeechRecognition || window.webkitSpeechRecognition
+const recognition = new SpeechRecognitaion()
+recognition.continuous = true
+//recognition.lang = 'de-DE'
+recognition.interimResults = false
+
+let ses
+
+let veri = ["gökhan","altan","yaprak"]
+
+
+
+btn.addEventListener('click', () => {    
+    recognition.start()
+})
+
+
+
+recognition.addEventListener('result', (event) => { 
+    ses = event.results[0][0].transcript.toLowerCase()
+    metin.innerHTML = ses
+        
+
+        recognition.addEventListener('end', () => {
+            let veriSira = 0
+            if(ses == veri[veriSira]){
+                setTimeout(()=>{
+                    veriSira++
+                    recognition.start()
+                },2000)
+            }
+            if(veriSira > 2){
+                metin.innerHTML = ses + "</br> Bitti"
+            }
+        })
+    
+ })
+
+      </script>
+        
+    </body>
+
+</html>
