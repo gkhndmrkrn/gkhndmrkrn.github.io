@@ -24,38 +24,76 @@ const btn = document.getElementById("btn")
 const metin = document.getElementById("metin")
 const SpeechRecognitaion = window.SpeechRecognition || window.webkitSpeechRecognition
 const recognition = new SpeechRecognitaion()
-recognition.continuous = true
+//recognition.continuous = false;
 //recognition.lang = 'de-DE'
-recognition.interimResults = false
+//recognition.interimResults = false
 
 let ses
+let sira = 0
+let veri = ["kemal","mahmut","ali"]
+let durum = true
 
-let veri = ["gökhan","altan","yaprak"]
 
-btn.addEventListener('click', () => {    
-    recognition.start()
+btn.addEventListener('click', () => {
+    btn.innerText = "Dinle Beni"
+    if(durum){
+        recognition.start()
+        durum = false
+    }    
+    if(sira == 2){
+        console.log("sıfırlamak için kod yaz")
+    }
 })
 
 
-recognition.addEventListener('result', (event) => { 
-    ses = event.results[0][0].transcript.toLowerCase()
-    metin.innerHTML = ses
-        
 
-        recognition.addEventListener('end', () => {
-            let veriSira = 0
-            if(ses == veri[veriSira]){
-                setTimeout(()=>{
-                    veriSira++
-                    recognition.start()
-                },2000)
-            }
-            if(veriSira > 3){
-                metin.innerHTML = ses + "</br> Bitti"
-            }
-        })
-    
+recognition.addEventListener('result', (event) => {
+    //ses = undefined 
+    ses = event.results[0][0].transcript.toLowerCase()    
  })
+
+recognition.addEventListener("start", ()=>{
+    ses = undefined
+    metin.innerHTML = veri[sira]
+    let sonlan = setTimeout(() => {
+        recognition.stop()
+    }, 2500);
+})
+
+recognition.addEventListener("end", ()=>{
+    console.log(sira)
+    if(ses !== undefined && ses == veri[sira]){
+        metin.innerHTML = ses + " -Doğru"
+        setTimeout(() => {
+            if(sira < 2){
+                sira++
+                recognition.start()
+            }            
+        }, 1500);
+    }
+    if(ses !== undefined && ses !== veri[sira]){
+        metin.innerHTML = veri[sira] + " - Ses verisi = " + ses
+        setTimeout(() => {
+            recognition.start()
+        }, 2500);
+        
+    }
+    if(ses == undefined){
+        metin.innerHTML = "Ses verisi alınamadı!"
+        durum = true
+    }
+    if(sira == 2 && durum == false ){
+        setTimeout(() => {
+            metin.innerHTML = "Tebrikler bitirdiniz"
+            durum = true
+            sira = 0
+            btn.innerText = "Tekrar"
+        }, 1500);
+    }
+ })
+
+//metin.innerHTML = event.results[0][0].confidence * 100 + "</br>"
+
 
       </script>
         
