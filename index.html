@@ -20,9 +20,8 @@ metin alanı
 </div>        
 <button id="btn">Dinle Beni</button>
 <script>
-var msg = new SpeechSynthesisUtterance();
-msg.text = "Hello World";
-window.speechSynthesis.speak(msg);
+let utterance = new SpeechSynthesisUtterance("Educative.io");
+speechSynthesis.speak(utterance);
 </script>
 </body>
 </html>
