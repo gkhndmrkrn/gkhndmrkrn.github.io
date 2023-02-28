@@ -1,27 +1,269 @@
 <!doctype html>
+
 <html>
-<head>
-<meta charset="utf-8">
-<title>Gkhn</title>
-<style>
-#metin{
-font-size: 50px;
+    <head>
+        <meta charset="utf-8">
+
+        <title>Gkhn</title>
+
+        
+        <style>
+            *{
+    margin: 0px;
+    padding: 0px;
 }
-button{
-height: 250px;
-width: 250px;
-font-size: 40px;
+#sesli-tekrar{
+    margin: 0px;
+    padding: 0px;
+    width: 100%;
+    height: auto;
+    float: left;
 }
-</style>
-</head>
-<body>
-<div id="metin">
-metin alanı
-</div>        
-<button id="btn">Dinle Beni</button>
-<script>
-let utterance = new SpeechSynthesisUtterance("Educative.io");
-speechSynthesis.speak(utterance);
-</script>
-</body>
+.metin{
+    width: 100%;
+    height: auto;
+    color: #464a4b;
+    text-align: center;
+    padding-top: 70px;
+    padding-bottom: 70px;
+    font-size: 100px;
+    float: left;
+    background-color: #dedfdf;
+}
+#ara{
+    width: 100%;
+    height: 2px;
+    float: left;
+    background-color: aliceblue;
+}
+#btn-alan{
+    width: 100%;
+    height: auto;
+    float: left;
+    padding-top: 70px;
+    padding-bottom: 70px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #cccccc;
+}
+#btn{
+    width: 80%;
+    height: 150px;
+    font-size: 50px;
+    border-radius: 25px;
+    font-weight: bold;
+    color: white;
+    background-color: #637a77;
+    border-color: white;
+}
+#oran-seviyesi{
+    width: 100%;
+    height: 200px;
+    float: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #678181;
+}
+.oran-alan{
+    width: 33.3%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #7a8c8a;
+}
+.oran-bt{
+    width: 80%;
+    height: 80%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-size: 90px;
+    border-radius: 25px;
+    background-color: #595965;
+    color:white;
+}
+#oran-degeri{
+    color:black;
+    background-color: #f1f1f1;
+}
+#oran{
+    width: 100%;
+    height: auto;
+    float: left;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: #ccdfdf;
+}
+#oranlar{
+    width: 90%;
+    height: auto;
+    padding: 5%;
+    font-size: 50px;
+}
+        </style>
+
+    </head>
+
+    <body>
+
+        <div id="sesli-tekrar">        
+            <div class="metin" id="metin1">das Abkommen</div>
+            <div id="ara"></div>
+            <div class="metin" id="metin2">antlaşma, sözleşme</div>
+            <div id="btn-alan">
+                <button id="btn">Başlat</button>
+            </div>
+
+            <div id="oran-seviyesi">
+                <div class="oran-alan">
+                    <button class="oran-bt" id="azal">-</button>
+                </div>
+                <div class="oran-alan">
+                    <div class="oran-bt" id="oran-degeri">80</div>
+                </div>
+                <div class="oran-alan">
+                    <button class="oran-bt" id="art">+</button>
+                </div>                
+            </div>      
+            <div id="oran">
+                <div id="oranlar">Doğruluk oranları : </div>
+            </div>
+                    
+        </div>
+        <script>
+            const btn = document.getElementById("btn")
+const metin = document.getElementById("metin1")
+const metin2 = document.getElementById("metin2")
+const oranlar = document.getElementById("oranlar")
+const art = document.getElementById("art")
+const azal = document.getElementById("azal")
+const oranBilgisi = document.getElementById("oran-degeri")
+const SpeechRecognitaion = window.SpeechRecognition || window.webkitSpeechRecognition
+const recognition = new SpeechRecognitaion()
+//recognition.continuous = false;
+recognition.lang = 'en-EN'
+//recognition.interimResults = false
+let ses
+let sira = 0
+let veri = ["black","yellow","green"]
+let veritr = ["1","2","3"]
+var sonOran = []
+metin.innerHTML = veri[sira]
+metin2.innerHTML = veritr[sira]
+let sonEleman = veri.length-1
+let durum = true
+var oran = 0
+let oranBelirleme
+let oranDegeri = 80
+let sesKontrol = true
+
+btn.addEventListener('click', (event) => {   
+    event.preventDefault() 
+    if(durum){
+        recognition.start()
+        durum = false
+    }
+    if(sonOran.length==veri.length){
+        oranlar.innerHTML = "Doğruluk oranları : "
+        sonOran = []
+    }
+})
+
+recognition.addEventListener('result', (event) => {
+    ses = event.results[0][0].transcript.toLowerCase()
+    oran = Math.ceil(event.results[0][0].confidence * 100)
+    event.preventDefault()
+})
+
+recognition.addEventListener("start", ()=>{
+    ses = undefined
+    sesKontrol = false
+    btn.innerText = "Ses dinleniyor"
+    btn.style.backgroundColor = "#7bd793"
+    metin.innerHTML = veri[sira]
+    metin2.innerHTML = veritr[sira]
+    setTimeout(() => {
+        recognition.stop()
+    }, 2500)
+})
+
+recognition.addEventListener("end", ()=>{
+
+    if(ses !== undefined && ses == veri[sira] && oran > oranDegeri){ //doğru okuma
+        metin.innerHTML = ses + " % " + oran
+        sonOran.push(oran)
+        if(sira > 0){
+            oranlar.innerHTML += " / "
+        }
+        oranlar.innerHTML += ses + " ( %" + oran + " )"
+
+        if(sira < sonEleman){
+            setTimeout(() => {
+                sira++
+                recognition.start()                    
+            }, 1500);
+        }
+        if(sira == sonEleman){
+            let genelOran = 0
+            for (let i = 0; i <= sonEleman; i++) {
+                genelOran += sonOran[i]
+            }
+            setTimeout(() => {
+                metin.innerHTML = "Tebrikler bitirdiniz"
+                metin2.innerHTML = "Genel ortalamanız </br>%" + Math.ceil(genelOran/(sonEleman+1))
+                btn.style.backgroundColor = "#cdd733"
+                durum = true
+                sira = 0
+                btn.innerText = "Tekrar Başlat"
+                sesKontrol = true
+            }, 1500);
+            }
+    }
+    if(ses !== undefined && ses == veri[sira] && oran < oranDegeri){
+        metin.innerHTML = veri[sira] + " oran: %" + oran
+        btn.innerText = "Telaffuz hatası"
+        btn.style.backgroundColor = "gray"
+        setTimeout(() => {
+            recognition.start()
+        }, 2700)        
+    }
+    if(ses !== undefined && ses !== veri[sira]){ // yanlış okuma
+        metin.innerHTML = "Ses " + ses
+        btn.innerText = "Hatalı okuma"
+        btn.style.backgroundColor = "gray"
+        setTimeout(() => {
+            recognition.start()
+        }, 2500)        
+    }
+
+    if(ses == undefined){
+        metin.innerHTML = "Ses verisi alınamadı!"
+        btn.innerText = "Durdu > Başlat"
+        btn.style.backgroundColor = "#a8ccd5"
+        durum = true
+    }
+})
+
+art.addEventListener("click", (event)=>{
+    event.preventDefault()
+    if(oranDegeri < 100 && sesKontrol){
+        oranDegeri++
+        oranBilgisi.innerText = oranDegeri
+    }    
+})
+azal.addEventListener("click", (event)=>{
+    event.preventDefault()
+    if(oranDegeri > 70 && sesKontrol){
+        oranDegeri--
+        oranBilgisi.innerText = oranDegeri
+    }
+})
+
+        </script>
+
+    </body>
 </html>
